@@ -1,0 +1,14 @@
+*.py[cod]
+.pytest_cache
+
+# Packages
+*.egg-info
+dist
+venv
+
+# Docs
+shortfuse-docs/api/*.rst
+
+# IDE
+.vscode/
+.idea/
