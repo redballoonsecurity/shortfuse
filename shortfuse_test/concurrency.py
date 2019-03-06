@@ -2,6 +2,7 @@ import os
 import random
 from multiprocessing import Pool
 
+from shortfuse_test.integration import retry_assertion
 from shortfuse_test.fixtures import build_random_string
 
 
@@ -60,13 +61,13 @@ def create_delete_dir(dirname, unlink=True):
     return True
 
 
-def test_create_delete_file(root_path):
+def create_delete_file_test(root_path):
     pool = Pool(8)
     results = []
 
-    file_paths = [os.path.join(root_path, "create_delete_file_%s" % index) for index in xrange(0, 10)]
+    file_paths = [os.path.join(root_path, "create_delete_file_%s" % index) for index in range(0, 10)]
     root_stats = os.stat(root_path)
-    for iteration in xrange(0, 10000):
+    for iteration in range(0, 10000):
         file_path = file_paths[random.randint(0, len(file_paths) - 1)]
         results.append(pool.apply_async(
             create_delete_file,
@@ -76,20 +77,20 @@ def test_create_delete_file(root_path):
     pool.join()
 
     u_root_stats = os.stat(root_path)
-    assert root_stats.st_nlink == u_root_stats.st_nlink
+    retry_assertion(lambda: root_stats.st_nlink == u_root_stats.st_nlink)
     for result in results:
         assert result
 
 
-def test_create_file(root_path):
+def create_file_test(root_path):
     pool = Pool(8)
     results = []
 
-    file_paths = [os.path.join(root_path, "create_delete_file_%s" % index) for index in xrange(0, 10)]
-    file_contents = [build_random_string(1024 * 200) for _ in xrange(0, 10)]
+    file_paths = [os.path.join(root_path, "create_delete_file_%s" % index) for index in range(0, 10)]
+    file_contents = [build_random_string(1024 * 200) for _ in range(0, 10)]
 
     root_stats = os.stat(root_path)
-    for iteration in xrange(0, 10000):
+    for iteration in range(0, 10000):
         file_path = file_paths[random.randint(0, len(file_paths) - 1)]
         file_content = file_contents[random.randint(0, len(file_contents) - 1)]
         results.append(pool.apply_async(
@@ -100,7 +101,7 @@ def test_create_file(root_path):
     pool.join()
 
     u_root_stats = os.stat(root_path)
-    assert root_stats.st_nlink + len(file_paths) == u_root_stats.st_nlink
+    retry_assertion(lambda: root_stats.st_nlink + len(file_paths) == u_root_stats.st_nlink)
     for result in results:
         assert result
     for file_path in file_paths:
@@ -109,13 +110,13 @@ def test_create_file(root_path):
         os.unlink(file_path)
 
 
-def test_create_delete_dir(root_path):
+def create_delete_dir_test(root_path):
     pool = Pool(8)
     results = []
 
-    dir_paths = [os.path.join(root_path, "create_delete_dir_%s" % index) for index in xrange(0, 10)]
+    dir_paths = [os.path.join(root_path, "create_delete_dir_%s" % index) for index in range(0, 10)]
     root_stats = os.stat(root_path)
-    for iteration in xrange(0, 10000):
+    for iteration in range(0, 10000):
         file_path = dir_paths[random.randint(0, len(dir_paths) - 1)]
         results.append(pool.apply_async(
             create_delete_dir,
@@ -125,6 +126,6 @@ def test_create_delete_dir(root_path):
     pool.join()
 
     u_root_stats = os.stat(root_path)
-    assert root_stats.st_nlink == u_root_stats.st_nlink
+    retry_assertion(lambda: root_stats.st_nlink == u_root_stats.st_nlink)
     for result in results:
         assert result

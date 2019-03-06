@@ -65,10 +65,14 @@ class FuseOS:
             raise e
 
     def chmod(self, path, mode):
-        return self._execute_op(lambda: os.lchmod(path, mode))
+        if hasattr(os, 'lchmod'):
+            return self._execute_op(lambda: os.lchmod(path, mode))
+        return self._execute_op(lambda: os.chmod(path, mode))
 
     def chown(self, path, uid, gid):
-        return self._execute_op(lambda: os.lchown(path, uid, gid))
+        if hasattr(os, 'lchown'):
+            return self._execute_op(lambda: os.lchown(path, uid, gid))
+        return self._execute_op(lambda: os.chown(path, uid, gid))
 
     def delete_xattr(self, path, key):
         def _execute():
@@ -104,7 +108,9 @@ class FuseOS:
         return self._execute_op(lambda: _execute())
 
     def stat(self, path):
-        return self._execute_op(lambda: os.lstat(path))
+        if hasattr(os, 'lstat'):
+            return self._execute_op(lambda: os.lstat(path))
+        return self._execute_op(lambda: os.stat(path))
 
     def symlink(self, source, link_name):
         return self._execute_op(lambda: os.symlink(source, link_name))
