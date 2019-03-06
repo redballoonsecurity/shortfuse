@@ -239,8 +239,8 @@ class MemoryFileSystem(MemoryDirectoryNode, FileSystem):
             ),
             fs_attributes=NodeFSAttributes(
                 bsize=512,
-                blocks=sys.maxint,
-                bavail=sys.maxint
+                blocks=sys.maxsize,
+                bavail=sys.maxsize
             ),
             extra_attributes=NodeExtraAttributes()
         )
