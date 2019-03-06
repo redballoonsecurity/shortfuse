@@ -4,8 +4,8 @@ from stat import S_ISDIR
 
 import pytest
 
-from shortfuse_test.integration import test_create, test_chmod, test_chown, test_mkdir, test_read, test_rmdir, \
-    test_unlink, test_truncate, test_write
+from shortfuse_test.integration import create_test, chmod_test, chown_test, mkdir_test, read_test, rmdir_test, \
+    unlink_test, truncate_test, write_test
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -21,50 +21,52 @@ class TestFS:
         assert 2 <= root_stats.st_nlink
 
     def test_create(self, fuse_dir, fuse_os):
-        test_create(fuse_dir, fuse_os)
+        create_test(fuse_dir, fuse_os)
 
     def test_chmod_dir(self, fuse_dir, fuse_os):
-        test_chmod(fuse_dir, fuse_os)
+        chmod_test(fuse_dir, fuse_os)
 
     def test_chmod_file(self, fuse_file, fuse_os):
-        test_chmod(fuse_file, fuse_os)
+        chmod_test(fuse_file, fuse_os)
 
-    def test_chown_dir(self, fuse_dir, fuse_os):
-        test_chown(fuse_dir, fuse_os)
+    @pytest.mark.usergroup
+    def test_chown_dir(self, fuse_dir, fuse_os, fuse_uid, fuse_gid):
+        chown_test(fuse_dir, fuse_os, fuse_uid, fuse_gid)
 
-    def test_chown_file(self, fuse_file, fuse_os):
-        test_chown(fuse_file, fuse_os)
+    @pytest.mark.usergroup
+    def test_chown_file(self, fuse_file, fuse_os, fuse_uid, fuse_gid):
+        chown_test(fuse_file, fuse_os, fuse_uid, fuse_gid)
 
     def test_mkdir_in_dir(self, fuse_dir, fuse_os):
-        test_mkdir(fuse_dir, fuse_os)
+        mkdir_test(fuse_dir, fuse_os)
 
     def test_mkdir_in_file(self, fuse_file, fuse_os):
         with pytest.raises(OSError):
-            test_mkdir(fuse_file, fuse_os)
+            mkdir_test(fuse_file, fuse_os)
 
-    def test_read(self, fuse_file_path, fuse_os):
-        test_read(fuse_file_path, fuse_os)
+    def test_read(self, fuse_file, fuse_os):
+        read_test(fuse_file, fuse_os, "")
 
     def test_rmdir_dir(self, fuse_dir, fuse_os):
         if fuse_dir.endswith('./'):
             with pytest.raises(OSError):
-                test_rmdir(fuse_dir, fuse_os)
+                rmdir_test(fuse_dir, fuse_os)
         else:
-            test_rmdir(fuse_dir, fuse_os)
+            rmdir_test(fuse_dir, fuse_os)
 
     def test_rmdir_file(self, fuse_file, fuse_os):
         with pytest.raises(OSError):
-            test_rmdir(fuse_file, fuse_os)
+            rmdir_test(fuse_file, fuse_os)
 
     def test_truncate(self, fuse_file_path, fuse_os):
-        test_truncate(fuse_file_path, fuse_os)
+        truncate_test(fuse_file_path, fuse_os)
 
     def test_unlink_in_dir(self, fuse_dir, fuse_os):
         with pytest.raises(OSError):
-            test_unlink(fuse_dir, fuse_os)
+            unlink_test(fuse_dir, fuse_os)
 
     def test_unlink_in_file(self, fuse_file, fuse_os):
-        test_unlink(fuse_file, fuse_os)
+        unlink_test(fuse_file, fuse_os)
 
     def test_write(self, fuse_file_path, fuse_os):
-        test_write(fuse_file_path, fuse_os)
+        write_test(fuse_file_path, fuse_os)
